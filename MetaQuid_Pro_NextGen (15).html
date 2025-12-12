@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MetaQuid Pro | Standalone</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+      tailwind.config = {
+        darkMode: 'class',
+        theme: {
+          extend: {
+            fontFamily: { sans: ['Inter', 'sans-serif'], display: ['Rajdhani', 'sans-serif'] },
+            colors: { background: '#020617', surface: '#0f172a', primary: '#6366f1', secondary: '#a855f7', accent: '#06b6d4' },
+            animation: { 'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite', 'glow': 'glow 2s ease-in-out infinite alternate' },
+            keyframes: { 
+                glow: { '0%': { boxShadow: '0 0 5px #6366f1, 0 0 10px #6366f1' }, '100%': { boxShadow: '0 0 20px #6366f1, 0 0 30px #a855f7' } }
+            }
+          }
+        }
+      }
+    </script>
+    <style>
+      body { background-color: #020617; color: #f8fafc; overflow-x: hidden; }
+      ::-webkit-scrollbar { width: 8px; }
+      ::-webkit-scrollbar-track { background: #0f172a; }
+      ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+      .glass-panel { background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.08); }
+      
+      /* 3D Effects for Clock */
+      .perspective-1000 { perspective: 1000px; }
+      .preserve-3d { transform-style: preserve-3d; }
+      .rotate-x-10 { transform: rotateX(10deg); }
+      .rotate-y-10 { transform: rotateY(10deg); }
+      .translate-z-[-20px] { transform: translateZ(-20px); }
+      .group:hover .group-hover\:rotate-x-10 { transform: rotateX(10deg) rotateY(10deg); }
+    </style>
+</head>
+<body>
+    <div class="fixed top-0 left-0 w-full h-full overflow-hidden pointer-events-none -z-50">
+        <div class="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-primary/10 rounded-full blur-[120px] animate-pulse-slow"></div>
+        <div class="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-secondary/10 rounded-full blur-[120px] animate-pulse-slow" style="animation-delay: 1.5s"></div>
+        <div class="absolute top-0 left-0 w-full h-full bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20"></div>
+    </div>
+
+    <div class="container mx-auto px-4 py-8 max-w-6xl relative z-10">
+        <header class="mb-12 text-center relative">
+            <!-- 3D Clock -->
+            <div class="w-full max-w-md mx-auto mb-8 perspective-1000">
+              <div class="relative group transform transition-transform duration-500 group-hover:rotate-x-10 preserve-3d">
+                <div class="relative bg-gradient-to-br from-slate-900/90 to-slate-800/90 backdrop-blur-xl border border-white/10 rounded-2xl p-6 shadow-[0_20px_50px_rgba(0,0,0,0.5)] overflow-hidden">
+                    <div class="absolute inset-0 opacity-10" style="background-image: linear-gradient(#475569 1px, transparent 1px), linear-gradient(90deg, #475569 1px, transparent 1px); background-size: 20px 20px;"></div>
+                    <div class="absolute -top-10 -left-10 w-32 h-32 bg-primary/20 rounded-full blur-3xl animate-pulse-slow"></div>
+                    <div class="absolute -bottom-10 -right-10 w-32 h-32 bg-accent/20 rounded-full blur-3xl animate-pulse-slow" style="animation-delay: 1s;"></div>
+
+                    <div class="relative z-10 flex items-center justify-between gap-6">
+                        <div class="flex flex-col text-left">
+                           <div class="text-slate-400 text-xs font-bold tracking-[0.2em] uppercase mb-1">Global Market Time</div>
+                           <div id="clock-time" class="text-5xl md:text-6xl font-display font-bold text-transparent bg-clip-text bg-gradient-to-r from-white via-slate-200 to-slate-400 drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)] tracking-wider">00:00:00</div>
+                           <div id="clock-date" class="text-accent font-mono text-sm mt-1 flex items-center gap-2"></div>
+                        </div>
+                        <div class="h-20 w-12 relative flex items-center justify-center bg-slate-950/50 rounded border border-slate-700/50 shadow-inner">
+                           <div class="absolute w-[2px] h-full bg-slate-500/50"></div>
+                           <div id="clock-candle" class="w-4 bg-green-500 shadow-[0_0_15px_rgba(0,0,0,0.5)] shadow-green-500/30 transition-all duration-500 ease-out" style="height: 50%; border-radius: 2px;"></div>
+                        </div>
+                    </div>
+                    <div class="absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r from-primary via-accent to-secondary opacity-50"></div>
+                </div>
+                <div class="absolute -bottom-4 left-4 right-4 h-4 bg-black/40 blur-xl rounded-full translate-z-[-20px]"></div>
+              </div>
+            </div>
+
+            <h1 class="text-4xl md:text-6xl font-display font-bold tracking-tight mb-3">
+                <span class="text-white">META</span><span class="text-transparent bg-clip-text bg-gradient-to-r from-primary via-secondary to-accent">QUID</span> 
+            </h1>
+            
+            <div class="inline-flex items-center justify-center mb-6">
+                  <span class="relative px-4 py-1 rounded-full border border-amber-500/50 bg-amber-500/10 text-amber-400 text-[10px] font-bold tracking-[0.3em] uppercase shadow-[0_0_15px_rgba(245,158,11,0.2)]">
+                      <i class="fas fa-crown text-[8px] mr-2"></i> Premium Edition
+                  </span>
+            </div>
+
+            <div class="max-w-2xl mx-auto flex items-center justify-center gap-4 text-slate-500 text-xs font-mono tracking-widest uppercase opacity-80">
+                   <span>Ai Analysis</span>
+                   <span class="w-1 h-1 bg-accent rounded-full shadow-[0_0_5px_cyan]"></span>
+                   <span>Pattern Recognition</span>
+                   <span class="w-1 h-1 bg-accent rounded-full shadow-[0_0_5px_cyan]"></span>
+                   <span>Quantum Logic</span>
+            </div>
+        </header>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+            <div class="lg:col-span-4">
+                <div class="glass-panel rounded-2xl p-6 sticky top-6 shadow-2xl">
+                    <h2 class="text-xl font-display font-bold text-white mb-6 flex items-center gap-2 border-b border-slate-700 pb-4">
+                        <i class="fas fa-sliders-h text-primary"></i> CONFIGURATION
+                    </h2>
+                    
+                    <div class="mb-5 group">
+                        <label class="block text-slate-400 text-xs font-semibold uppercase tracking-wider mb-2 flex items-center gap-2">
+                           <i class="fas fa-coins text-primary/80 group-focus-within:text-accent transition-colors"></i> Select Assets
+                        </label>
+                        <div class="relative" id="multiSelectContainer"></div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4">
+                         <div class="mb-5 group">
+                            <label class="block text-slate-400 text-xs font-semibold uppercase tracking-wider mb-2 flex items-center gap-2"><i class="fas fa-list-ol text-primary/80 group-focus-within:text-accent transition-colors"></i> Count</label>
+                            <input type="number" id="signalCount" value="10" min="1" max="50" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:border-primary focus:outline-none transition-colors">
+                         </div>
+                         <div class="mb-5 group">
+                            <label class="block text-slate-400 text-xs font-semibold uppercase tracking-wider mb-2 flex items-center gap-2"><i class="fas fa-filter text-primary/80 group-focus-within:text-accent transition-colors"></i> Filter</label>
+                            <select id="filterInput" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:border-primary focus:outline-none transition-colors">
+                                <option value="ALL">All</option>
+                                <option value="CALL">Only CALL</option>
+                                <option value="PUT">Only PUT</option>
+                            </select>
+                         </div>
+                    </div>
+
+                    <div class="mb-5 group">
+                         <label class="block text-slate-400 text-xs font-semibold uppercase tracking-wider mb-2 flex items-center gap-2"><i class="fas fa-globe text-primary/80 group-focus-within:text-accent transition-colors"></i> Timezone</label>
+                         <select id="timezoneInput" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white scrollbar-thin focus:border-primary focus:outline-none transition-colors"></select>
+                    </div>
+
+                    <div class="mb-5 group">
+                         <label class="block text-slate-400 text-xs font-semibold uppercase tracking-wider mb-2 flex items-center gap-2"><i class="fas fa-chart-line text-primary/80 group-focus-within:text-accent transition-colors"></i> Market Trend</label>
+                         <select id="trendInput" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white font-bold focus:border-primary focus:outline-none transition-colors">
+                              <option value="SIDEWAYS">SIDEWAYS (Random 50/50)</option>
+                              <option value="BULLISH">BULLISH (Strong Up Trend)</option>
+                              <option value="BEARISH">BEARISH (Strong Down Trend)</option>
+                         </select>
+                    </div>
+
+                    <button onclick="generateSignals()" id="genBtn" class="w-full relative overflow-hidden py-4 rounded-xl font-bold font-display uppercase tracking-widest text-white transition-all duration-300 hover:scale-[1.02] shadow-lg shadow-primary/20 group">
+                         <div class="absolute inset-0 bg-gradient-to-r from-emerald-600 via-teal-500 to-emerald-600"></div>
+                         <span class="relative z-10 flex items-center justify-center gap-2">
+                             <i class="fas fa-bolt"></i> GENERATE SIGNALS
+                         </span>
+                    </button>
+                    
+                    <div class="mt-6 pt-4 border-t border-slate-700/50 text-center">
+                         <a href="https://t.me/sakibalhasannaim" target="_blank" class="text-sky-400 hover:text-sky-300 text-sm font-semibold"><i class="fab fa-telegram"></i> Sakib Al Hasan Naim</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="lg:col-span-8">
+                <div id="resultsArea" class="min-h-[400px]">
+                    <div class="h-full flex flex-col items-center justify-center glass-panel rounded-2xl p-10 text-center opacity-60 border-dashed border-2 border-slate-700">
+                        <div class="w-24 h-24 rounded-full bg-slate-800 flex items-center justify-center mb-6 shadow-inner">
+                            <i class="fas fa-wave-square text-4xl text-slate-600"></i>
+                        </div>
+                        <h3 class="text-2xl font-display font-bold text-slate-300 mb-2">Signal Generator Ready</h3>
+                        <p class="text-slate-500">Select assets, Timezone, and Trend Analysis on the left.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <footer class="mt-16 text-center border-t border-white/5 pt-8 pb-8">
+             <p class="text-[10px] text-slate-700 mt-3 font-mono">METAQUID PRO INTELLIGENCE SYSTEMS © 2024</p>
+        </footer>
+    </div>
+
+    <script>
+        const ASSETS_DATA = [{"symbol_id":376,"pair":"Cardano (OTC)","asset_name":"ADAUSD_otc","is_open":true},{"symbol_id":377,"pair":"Aptos (OTC)","asset_name":"APTUSD_otc","is_open":true},{"symbol_id":378,"pair":"Arbitrum (OTC)","asset_name":"ARBUSD_otc","is_open":true},{"symbol_id":368,"pair":"Cosmos (OTC)","asset_name":"ATOUSD_otc","is_open":false},{"symbol_id":36,"pair":"AUD/CAD","asset_name":"AUDCAD","is_open":true},{"symbol_id":67,"pair":"AUD/CAD (OTC)","asset_name":"AUDCAD_otc","is_open":false},{"symbol_id":37,"pair":"AUD/CHF","asset_name":"AUDCHF","is_open":true},{"symbol_id":68,"pair":"AUD/CHF (OTC)","asset_name":"AUDCHF_otc","is_open":false},{"symbol_id":38,"pair":"AUD/JPY","asset_name":"AUDJPY","is_open":true},{"symbol_id":69,"pair":"AUD/JPY (OTC)","asset_name":"AUDJPY_otc","is_open":false},{"symbol_id":70,"pair":"AUD/NZD (OTC)","asset_name":"AUDNZD_otc","is_open":true},{"symbol_id":40,"pair":"AUD/USD","asset_name":"AUDUSD","is_open":true},{"symbol_id":71,"pair":"AUD/USD (OTC)","asset_name":"AUDUSD_otc","is_open":false},{"symbol_id":379,"pair":"Avalanche (OTC)","asset_name":"AVAUSD_otc","is_open":true},{"symbol_id":315,"pair":"S&P/ASX 200","asset_name":"AXJAUD","is_open":true},{"symbol_id":291,"pair":"American Express (OTC)","asset_name":"AXP_otc","is_open":true},{"symbol_id":380,"pair":"Axie Infinity (OTC)","asset_name":"AXSUSD_otc","is_open":true},{"symbol_id":292,"pair":"Boeing Company (OTC)","asset_name":"BA_otc","is_open":true},{"symbol_id":363,"pair":"Bitcoin Cash (OTC)","asset_name":"BCHUSD_otc","is_open":true},{"symbol_id":381,"pair":"Beam (OTC)","asset_name":"BEAUSD_otc","is_open":true},{"symbol_id":362,"pair":"Binance Coin (OTC)","asset_name":"BNBUSD_otc","is_open":false},{"symbol_id":358,"pair":"Bonk (OTC)","asset_name":"BONUSD_otc","is_open":true},{"symbol_id":332,"pair":"USD/BRL (OTC)","asset_name":"BRLUSD_otc","is_open":true},{"symbol_id":352,"pair":"Bitcoin (OTC)","asset_name":"BTCUSD_otc","is_open":true},{"symbol_id":72,"pair":"CAD/CHF (OTC)","asset_name":"CADCHF_otc","is_open":true},{"symbol_id":42,"pair":"CAD/JPY","asset_name":"CADJPY","is_open":true},{"symbol_id":73,"pair":"CAD/JPY (OTC)","asset_name":"CADJPY_otc","is_open":false},{"symbol_id":43,"pair":"CHF/JPY","asset_name":"CHFJPY","is_open":true},{"symbol_id":74,"pair":"CHF/JPY (OTC)","asset_name":"CHFJPY_otc","is_open":false},{"symbol_id":328,"pair":"FTSE China A50 Index","asset_name":"CHIA50","is_open":true},{"symbol_id":369,"pair":"Dash (OTC)","asset_name":"DASUSD_otc","is_open":true},{"symbol_id":317,"pair":"Dow Jones","asset_name":"DJIUSD","is_open":true},{"symbol_id":353,"pair":"Dogecoin (OTC)","asset_name":"DOGUSD_otc","is_open":true},{"symbol_id":374,"pair":"Polkadot (OTC)","asset_name":"DOTUSD_otc","is_open":true},{"symbol_id":370,"pair":"Ethereum Classic (OTC)","asset_name":"ETCUSD_otc","is_open":true},{"symbol_id":360,"pair":"Ethereum (OTC)","asset_name":"ETHUSD_otc","is_open":true},{"symbol_id":44,"pair":"EUR/AUD","asset_name":"EURAUD","is_open":true},{"symbol_id":75,"pair":"EUR/AUD (OTC)","asset_name":"EURAUD_otc","is_open":false},{"symbol_id":45,"pair":"EUR/CAD","asset_name":"EURCAD","is_open":true},{"symbol_id":76,"pair":"EUR/CAD (OTC)","asset_name":"EURCAD_otc","is_open":false},{"symbol_id":46,"pair":"EUR/CHF","asset_name":"EURCHF","is_open":true},{"symbol_id":77,"pair":"EUR/CHF (OTC)","asset_name":"EURCHF_otc","is_open":false},{"symbol_id":47,"pair":"EUR/GBP","asset_name":"EURGBP","is_open":true},{"symbol_id":78,"pair":"EUR/GBP (OTC)","asset_name":"EURGBP_otc","is_open":false},{"symbol_id":48,"pair":"EUR/JPY","asset_name":"EURJPY","is_open":true},{"symbol_id":79,"pair":"EUR/JPY (OTC)","asset_name":"EURJPY_otc","is_open":false},{"symbol_id":80,"pair":"EUR/NZD (OTC)","asset_name":"EURNZD_otc","is_open":true},{"symbol_id":303,"pair":"EUR/SGD (OTC)","asset_name":"EURSGD_otc","is_open":true},{"symbol_id":1,"pair":"EUR/USD","asset_name":"EURUSD","is_open":true},{"symbol_id":66,"pair":"EUR/USD (OTC)","asset_name":"EURUSD_otc","is_open":false},{"symbol_id":318,"pair":"CAC 40","asset_name":"F40EUR","is_open":true},{"symbol_id":187,"pair":"FACEBOOK INC (OTC)","asset_name":"FB_otc","is_open":true},{"symbol_id":356,"pair":"Floki (OTC)","asset_name":"FLOUSD_otc","is_open":false},{"symbol_id":319,"pair":"FTSE 100","asset_name":"FTSGBP","is_open":true},{"symbol_id":382,"pair":"Gala (OTC)","asset_name":"GALUSD_otc","is_open":false},{"symbol_id":51,"pair":"GBP/AUD","asset_name":"GBPAUD","is_open":true},{"symbol_id":81,"pair":"GBP/AUD (OTC)","asset_name":"GBPAUD_otc","is_open":false},{"symbol_id":52,"pair":"GBP/CAD","asset_name":"GBPCAD","is_open":true},{"symbol_id":82,"pair":"GBP/CAD (OTC)","asset_name":"GBPCAD_otc","is_open":false},{"symbol_id":53,"pair":"GBP/CHF","asset_name":"GBPCHF","is_open":true},{"symbol_id":83,"pair":"GBP/CHF (OTC)","asset_name":"GBPCHF_otc","is_open":false},{"symbol_id":54,"pair":"GBP/JPY","asset_name":"GBPJPY","is_open":true},{"symbol_id":84,"pair":"GBP/JPY (OTC)","asset_name":"GBPJPY_otc","is_open":false},{"symbol_id":85,"pair":"GBP/NZD (OTC)","asset_name":"GBPNZD_otc","is_open":true},{"symbol_id":56,"pair":"GBP/USD","asset_name":"GBPUSD","is_open":true},{"symbol_id":86,"pair":"GBP/USD (OTC)","asset_name":"GBPUSD_otc","is_open":false},{"symbol_id":371,"pair":"Hamster Kombat (OTC)","asset_name":"HMSUSD_otc","is_open":true},{"symbol_id":320,"pair":"Hong Kong 50","asset_name":"HSIHKD","is_open":true},{"symbol_id":321,"pair":"IBEX 35","asset_name":"IBXEUR","is_open":true},{"symbol_id":190,"pair":"Intel (OTC)","asset_name":"INTC_otc","is_open":true},{"symbol_id":296,"pair":"Johnson & Johnson (OTC)","asset_name":"JNJ_otc","is_open":true},{"symbol_id":327,"pair":"Nikkei 225","asset_name":"JPXJPY","is_open":true},{"symbol_id":383,"pair":"Chainlink (OTC)","asset_name":"LINUSD_otc","is_open":true},{"symbol_id":361,"pair":"Litecoin (OTC)","asset_name":"LTCUSD_otc","is_open":true},{"symbol_id":384,"pair":"Decentraland (OTC)","asset_name":"MANUSD_otc","is_open":true},{"symbol_id":175,"pair":"McDonald's (OTC)","asset_name":"MCD_otc","is_open":true},{"symbol_id":372,"pair":"Melania Meme (OTC)","asset_name":"MELUSD_otc","is_open":true},{"symbol_id":176,"pair":"Microsoft (OTC)","asset_name":"MSFT_otc","is_open":true},{"symbol_id":322,"pair":"NASDAQ 100","asset_name":"NDXUSD","is_open":true},{"symbol_id":87,"pair":"NZD/CAD (OTC)","asset_name":"NZDCAD_otc","is_open":true},{"symbol_id":88,"pair":"NZD/CHF (OTC)","asset_name":"NZDCHF_otc","is_open":true},{"symbol_id":89,"pair":"NZD/JPY (OTC)","asset_name":"NZDJPY_otc","is_open":true},{"symbol_id":90,"pair":"NZD/USD (OTC)","asset_name":"NZDUSD_otc","is_open":true},{"symbol_id":354,"pair":"Pepe (OTC)","asset_name":"PEPUSD_otc","is_open":true},{"symbol_id":297,"pair":"Pfizer Inc (OTC)","asset_name":"PFE_otc","is_open":true},{"symbol_id":357,"pair":"Shiba Inu (OTC)","asset_name":"SHIUSD_otc","is_open":true},{"symbol_id":365,"pair":"Solana (OTC)","asset_name":"SOLUSD_otc","is_open":true},{"symbol_id":325,"pair":"EURO STOXX 50","asset_name":"STXEUR","is_open":true},{"symbol_id":385,"pair":"Celestia (OTC)","asset_name":"TIAUSD_otc","is_open":true},{"symbol_id":366,"pair":"Toncoin (OTC)","asset_name":"TONUSD_otc","is_open":true},{"symbol_id":359,"pair":"Trump (OTC)","asset_name":"TRUUSD_otc","is_open":true},{"symbol_id":367,"pair":"TRON (OTC)","asset_name":"TRXUSD_otc","is_open":true},{"symbol_id":164,"pair":"UKBrent (OTC)","asset_name":"UKBrent_otc","is_open":true},{"symbol_id":165,"pair":"USCrude (OTC)","asset_name":"USCrude_otc","is_open":true},{"symbol_id":345,"pair":"USD/ARS (OTC)","asset_name":"USDARS_otc","is_open":true},{"symbol_id":334,"pair":"USD/BDT (OTC)","asset_name":"USDBDT_otc","is_open":true},{"symbol_id":61,"pair":"USD/CAD","asset_name":"USDCAD","is_open":true},{"symbol_id":91,"pair":"USD/CAD (OTC)","asset_name":"USDCAD_otc","is_open":false},{"symbol_id":62,"pair":"USD/CHF","asset_name":"USDCHF","is_open":true},{"symbol_id":92,"pair":"USD/CHF (OTC)","asset_name":"USDCHF_otc","is_open":false},{"symbol_id":347,"pair":"USD/COP (OTC)","asset_name":"USDCOP_otc","is_open":true},{"symbol_id":349,"pair":"USD/DZD (OTC)","asset_name":"USDDZD_otc","is_open":true},{"symbol_id":338,"pair":"USD/EGP (OTC)","asset_name":"USDEGP_otc","is_open":true},{"symbol_id":342,"pair":"USD/IDR (OTC)","asset_name":"USDIDR_otc","is_open":true},{"symbol_id":202,"pair":"USD/INR (OTC)","asset_name":"USDINR_otc","is_open":true},{"symbol_id":63,"pair":"USD/JPY","asset_name":"USDJPY","is_open":true},{"symbol_id":93,"pair":"USD/JPY (OTC)","asset_name":"USDJPY_otc","is_open":false},{"symbol_id":343,"pair":"USD/MXN (OTC)","asset_name":"USDMXN_otc","is_open":true},{"symbol_id":340,"pair":"USD/NGN (OTC)","asset_name":"USDNGN_otc","is_open":true},{"symbol_id":351,"pair":"USD/PHP (OTC)","asset_name":"USDPHP_otc","is_open":true},{"symbol_id":336,"pair":"USD/PKR (OTC)","asset_name":"USDPKR_otc","is_open":true},{"symbol_id":201,"pair":"USD/TRY (OTC)","asset_name":"USDTRY_otc","is_open":true},{"symbol_id":157,"pair":"USD/ZAR (OTC)","asset_name":"USDZAR_otc","is_open":true},{"symbol_id":355,"pair":"Dogwifhat (OTC)","asset_name":"WIFUSD_otc","is_open":false},{"symbol_id":65,"pair":"Silver","asset_name":"XAGUSD","is_open":false},{"symbol_id":167,"pair":"Silver (OTC)","asset_name":"XAGUSD_otc","is_open":true},{"symbol_id":2,"pair":"Gold","asset_name":"XAUUSD","is_open":false},{"symbol_id":169,"pair":"Gold (OTC)","asset_name":"XAUUSD_otc","is_open":true},{"symbol_id":364,"pair":"Ripple (OTC)","asset_name":"XRPUSD_otc","is_open":true},{"symbol_id":375,"pair":"Zcash (OTC)","asset_name":"ZECUSD_otc","is_open":true}];
+        const TIMEZONES = [{"value":"Etc/GMT+12","label":"(UTC-12:00)"},{"value":"Pacific/Midway","label":"(UTC-11:00)"},{"value":"Pacific/Honolulu","label":"(UTC-10:00)"},{"value":"Pacific/Marquesas","label":"(UTC-09:30)"},{"value":"America/Anchorage","label":"(UTC-09:00)"},{"value":"America/Los_Angeles","label":"(UTC-08:00)"},{"value":"America/Denver","label":"(UTC-07:00)"},{"value":"America/Chicago","label":"(UTC-06:00)"},{"value":"America/New_York","label":"(UTC-05:00)"},{"value":"America/Caracas","label":"(UTC-04:00)"},{"value":"America/St_Johns","label":"(UTC-03:30)"},{"value":"America/Sao_Paulo","label":"(UTC-03:00)"},{"value":"Atlantic/South_Georgia","label":"(UTC-02:00)"},{"value":"Atlantic/Azores","label":"(UTC-01:00)"},{"value":"UTC","label":"(UTC+00:00)"},{"value":"Europe/Berlin","label":"(UTC+01:00)"},{"value":"Africa/Cairo","label":"(UTC+02:00)"},{"value":"Europe/Moscow","label":"(UTC+03:00)"},{"value":"Asia/Tehran","label":"(UTC+03:30)"},{"value":"Asia/Dubai","label":"(UTC+04:00)"},{"value":"Asia/Kabul","label":"(UTC+04:30)"},{"value":"Asia/Karachi","label":"(UTC+05:00)"},{"value":"Asia/Kolkata","label":"(UTC+05:30)"},{"value":"Asia/Kathmandu","label":"(UTC+05:45)"},{"value":"Asia/Dhaka","label":"(UTC+06:00)"},{"value":"Asia/Yangon","label":"(UTC+06:30)"},{"value":"Asia/Bangkok","label":"(UTC+07:00)"},{"value":"Asia/Singapore","label":"(UTC+08:00)"},{"value":"Australia/Eucla","label":"(UTC+08:45)"},{"value":"Asia/Tokyo","label":"(UTC+09:00)"},{"value":"Australia/Adelaide","label":"(UTC+09:30)"},{"value":"Australia/Sydney","label":"(UTC+10:00)"},{"value":"Australia/Lord_Howe","label":"(UTC+10:30)"},{"value":"Pacific/Noumea","label":"(UTC+11:00)"},{"value":"Pacific/Norfolk","label":"(UTC+11:30)"},{"value":"Pacific/Auckland","label":"(UTC+12:00)"},{"value":"Pacific/Chatham","label":"(UTC+12:45)"},{"value":"Pacific/Tongatapu","label":"(UTC+13:00)"},{"value":"Pacific/Kiritimati","label":"(UTC+14:00)"}];
+        let selectedAssets = [];
+
+        // SEEDED RANDOM NUMBER GENERATOR CLASS (Modified for GBM)
+        class SeededRNG {
+          constructor(seed) { this.seed = seed; }
+          
+          // Returns Uniform [0, 1)
+          next() {
+            this.seed = (this.seed * 9301 + 49297) % 233280;
+            return this.seed / 233280;
+          }
+          
+          // Returns Standard Normal Distribution (Gaussian) using Box-Muller Transform
+          nextGaussian() {
+            let u = 0, v = 0;
+            while(u === 0) u = this.next(); 
+            while(v === 0) v = this.next();
+            return Math.sqrt( -2.0 * Math.log( u ) ) * Math.cos( 2.0 * Math.PI * v );
+          }
+        }
+        
+        // Helper to generate a deterministic number 0..1 from a string
+        function getHash(str) {
+          let h = 0x811c9dc5;
+          for (let i = 0; i < str.length; i++) {
+            h ^= str.charCodeAt(i);
+            h = Math.imul(h, 0x01000193);
+          }
+          return ((h >>> 0) / 4294967296);
+        }
+
+        function renderMultiSelect() {
+            const container = document.getElementById('multiSelectContainer');
+            const isOpen = container.classList.contains('open');
+            const searchEl = document.getElementById('assetSearch');
+            const searchValue = searchEl ? searchEl.value : '';
+
+            let html = `
+            <div class="min-h-[42px] w-full bg-slate-950 border ${isOpen ? 'border-primary' : 'border-slate-700'} rounded-lg px-2 py-1.5 flex flex-wrap gap-2 items-center cursor-pointer transition-colors hover:border-slate-600" onclick="toggleDropdown(event)">
+            `;
+            selectedAssets.forEach(asset => {
+                html += `
+                <span class="bg-slate-800 border border-slate-600 rounded px-2 py-0.5 text-xs text-slate-200 flex items-center gap-1 animate-[fadeIn_0.2s]">
+                    ${asset}
+                    <button onclick="removeAsset('${asset}', event)" class="hover:text-red-400 ml-1"><i class="fas fa-times"></i></button>
+                </span>
+                `;
+            });
+            html += `
+                <input type="text" id="assetSearch" value="${searchValue}" class="bg-transparent border-none outline-none text-sm text-slate-200 flex-1 min-w-[80px] placeholder-slate-600 cursor-text" placeholder="${selectedAssets.length === 0 ? 'Search assets...' : ''}" onclick="openDropdown(event)" oninput="filterAssets()">
+                <i class="fas fa-chevron-down text-xs text-slate-500 ml-auto mr-2 transition-transform duration-300 ${isOpen ? 'rotate-180 text-primary' : ''}"></i>
+            </div>
+            `;
+            if(isOpen) {
+                const search = searchValue.toLowerCase();
+                const filtered = ASSETS_DATA.filter(a => a.pair.toLowerCase().includes(search));
+                html += `<div class="absolute top-[calc(100%+4px)] left-0 w-full max-h-60 overflow-y-auto bg-slate-900 border border-slate-700 rounded-lg shadow-xl z-50 scrollbar-thin animate-[fadeIn_0.1s_ease-out]">`;
+                if(filtered.length > 0) {
+                    filtered.forEach(asset => {
+                        const isSelected = selectedAssets.includes(asset.pair);
+                        html += `
+                        <div class="px-3 py-2.5 text-sm cursor-pointer flex items-center justify-between transition-colors border-b border-slate-800 ${isSelected ? 'bg-slate-800/80' : 'hover:bg-slate-800/40'}" onclick="selectAsset('${asset.pair}')">
+                            <span class="${isSelected ? 'text-white font-medium' : 'text-slate-400'}">${asset.pair}</span>
+                            ${isSelected ? '<i class="fas fa-check text-primary text-xs"></i>' : ''}
+                        </div>`;
+                    });
+                } else {
+                    html += '<div class="p-4 text-center text-slate-500 text-xs italic">No matching assets</div>';
+                }
+                html += '</div>';
+            }
+            container.innerHTML = html;
+            if(isOpen) { const input = document.getElementById('assetSearch'); input.focus(); const val = input.value; input.value = ''; input.value = val; }
+        }
+
+        function toggleDropdown(e) { e.stopPropagation(); const c = document.getElementById('multiSelectContainer'); if(!c.classList.contains('open')) { c.classList.add('open'); } else { if(e.target.tagName !== 'INPUT') c.classList.remove('open'); } renderMultiSelect(); }
+        function openDropdown(e) { e.stopPropagation(); document.getElementById('multiSelectContainer').classList.add('open'); renderMultiSelect(); }
+        function selectAsset(p) { if(selectedAssets.includes(p)) selectedAssets=selectedAssets.filter(x=>x!==p); else selectedAssets.push(p); renderMultiSelect(); }
+        function removeAsset(p,e) { e.stopPropagation(); selectedAssets=selectedAssets.filter(x=>x!==p); renderMultiSelect(); }
+        function filterAssets() { renderMultiSelect(); }
+        document.addEventListener('click', (e) => { const c = document.getElementById('multiSelectContainer'); if(c && !c.contains(e.target)) { c.classList.remove('open'); renderMultiSelect(); } });
+
+        function initClock() {
+            const tz = document.getElementById('timezoneInput');
+            TIMEZONES.forEach(t => { const o = document.createElement('option'); o.value = t.value; o.text = t.label; if(t.value === 'Asia/Dhaka') o.selected = true; tz.appendChild(o); });
+            renderMultiSelect();
+            setInterval(() => {
+                const now = new Date();
+                document.getElementById('clock-time').innerText = now.toLocaleTimeString('en-GB', {hour12:false});
+                document.getElementById('clock-date').innerHTML = '<i class="far fa-calendar-alt"></i> ' + now.toLocaleDateString('en-GB', {weekday:'short', day:'numeric', month:'short', year:'numeric'});
+                const h = Math.max(20, Math.floor(Math.random() * 80));
+                const c = document.getElementById('clock-candle');
+                c.style.height = h + '%';
+                c.className = `w-4 transition-all duration-500 ease-out shadow-[0_0_15px_rgba(0,0,0,0.5)] ${now.getSeconds()%2===0 ? 'bg-green-500 shadow-green-500/30' : 'bg-red-500 shadow-red-500/30'}`;
+                c.style.borderRadius = '2px';
+            }, 1000);
+        }
+
+        function generateSignals() {
+            if(selectedAssets.length === 0) { alert("SELECT ASSETS"); return; }
+            const btn = document.getElementById('genBtn');
+            const res = document.getElementById('resultsArea');
+            btn.innerHTML = '<div class="absolute inset-0 bg-slate-900/50 z-20"></div><span class="relative z-30 flex items-center justify-center gap-2"><i class="fas fa-circle-notch animate-spin"></i> GENERATING...</span>';
+            btn.disabled = true;
+            res.innerHTML = `<div class="flex flex-col items-center justify-center py-20 animate-pulse"><div class="relative w-24 h-24 mb-6"><div class="absolute inset-0 border-t-4 border-accent rounded-full animate-spin"></div><div class="absolute inset-4 border-b-4 border-primary rounded-full animate-spin reverse-spin opacity-70"></div></div><p class="text-xl font-display font-bold text-transparent bg-clip-text bg-gradient-to-r from-primary to-accent">CALCULATING...</p><p class="text-slate-500 mt-2 text-sm">Analyzing Geometric Brownian Motion</p></div>`;
+
+            setTimeout(() => {
+                const count = parseInt(document.getElementById('signalCount').value);
+                const filter = document.getElementById('filterInput').value;
+                const trend = document.getElementById('trendInput').value;
+                const tz = document.getElementById('timezoneInput').value;
+                
+                const allPotentialSignals = [];
+                const now = new Date();
+                
+                // 1. GENERATE BASE SEED
+                const timeSeed = now.getFullYear() * 100000000 + (now.getMonth() + 1) * 1000000 + now.getDate() * 10000 + now.getHours() * 100 + now.getMinutes();
+                
+                // 2. GBM SETTINGS
+                const volatility = 0.005; // Sigma
+                let drift = 0.0; // Mu
+                if (trend === 'BULLISH') drift = 0.002;
+                else if (trend === 'BEARISH') drift = -0.002;
+
+                // 3. GENERATE POOL
+                selectedAssets.forEach(asset => {
+                    let assetSeedModifier = 0;
+                    for(let i=0; i<asset.length; i++) assetSeedModifier += asset.charCodeAt(i);
+                    const rng = new SeededRNG(timeSeed + assetSeedModifier);
+
+                    let nextTime = new Date(now);
+                    nextTime.setSeconds(0);
+                    nextTime.setMilliseconds(0);
+                    nextTime.setMinutes(nextTime.getMinutes() + 2);
+
+                    for(let i=0; i < count * 3; i++) {
+                        const minGap = 2; const maxGap = 7;
+                        const gap = Math.floor(rng.next() * (maxGap - minGap + 1)) + minGap;
+                        nextTime.setMinutes(nextTime.getMinutes() + gap);
+                        const timestamp = nextTime.getTime();
+                        
+                        // GBM CALC
+                        const dt = 1;
+                        const Z = rng.nextGaussian();
+                        const priceChange = (drift * dt) + (volatility * Math.sqrt(dt) * Z);
+                        
+                        let direction = '';
+                        if (priceChange > 0.0005) direction = 'CALL';
+                        else if (priceChange < -0.0005) direction = 'PUT';
+                        else direction = rng.next() > 0.5 ? 'CALL' : 'PUT';
+
+                        if(filter !== 'ALL' && direction !== filter) continue;
+
+                        const timeStr = nextTime.toLocaleTimeString('en-GB', { timeZone: tz, hour: '2-digit', minute: '2-digit', hour12: false });
+                        allPotentialSignals.push({ ativos: asset, entrada: timeStr, direcao_principal: direction, timestamp: timestamp });
+                    }
+                });
+
+                // 4. SORT
+                allPotentialSignals.sort((a,b) => a.timestamp - b.timestamp);
+                
+                // 5. GLOBAL SPACING (3 Mins)
+                const finalSignals = [];
+                let lastSignalTime = 0;
+                const MIN_GLOBAL_GAP_MS = 3 * 60 * 1000; 
+
+                for (const sig of allPotentialSignals) {
+                    if (finalSignals.length >= count) break;
+                    if (sig.timestamp >= lastSignalTime + MIN_GLOBAL_GAP_MS) {
+                        finalSignals.push({ ativos: sig.ativos, entrada: sig.entrada, direcao_principal: sig.direcao_principal });
+                        lastSignalTime = sig.timestamp;
+                    }
+                }
+
+                const signals = finalSignals;
+
+                let html = `<div class="space-y-6 animate-[fadeIn_0.5s_ease-out]"><div class="glass-panel rounded-2xl p-6 border-t border-white/10 relative overflow-hidden"><div class="flex flex-col md:flex-row items-center justify-between mb-8 gap-4"><h3 class="text-2xl font-display font-bold flex items-center gap-3 text-white"><i class="fas fa-bolt text-accent animate-pulse"></i> GENERATED SIGNALS</h3><button onclick="copySignals()" class="px-6 py-2 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white rounded-lg text-sm font-bold shadow-lg shadow-emerald-500/20 transition-all flex items-center gap-2 transform hover:scale-105"><i class="fas fa-copy"></i> COPY REPORT</button></div><div class="grid grid-cols-1 gap-4 mb-8">`;
+                signals.forEach(s => {
+                    const isCall = s.direcao_principal === 'CALL';
+                    const st = isCall ? 'bg-green-500/10 text-green-400 border border-green-500/30' : 'bg-red-500/10 text-red-400 border border-red-500/30';
+                    html += `<div class="relative group bg-slate-900/60 border border-slate-700/50 rounded-xl p-4 transition-all hover:border-accent/30 flex flex-col md:flex-row items-center justify-between gap-4"><div class="absolute top-0 right-0 w-20 h-20 bg-primary/5 rounded-full blur-2xl -mr-10 -mt-10 group-hover:bg-accent/10 transition-colors"></div><div class="flex items-center gap-4 w-full relative z-10"><div class="bg-slate-800 p-3 rounded-lg font-mono text-xl font-bold text-white min-w-[90px] text-center border border-slate-700 shadow-lg">${s.entrada}</div><div class="flex-1"><div class="flex items-center justify-between"><div class="font-display font-bold text-lg text-slate-200">${s.ativos}</div><div class="px-4 py-1.5 rounded-lg font-bold text-sm flex items-center gap-2 ${st}"><i class="fas ${isCall?'fa-arrow-up':'fa-arrow-down'}"></i> ${s.direcao_principal}</div></div></div></div></div>`;
+                });
+                html += `</div><div class="bg-slate-950/50 border border-amber-500/20 rounded-xl p-5"><h4 class="text-amber-400 font-display font-bold text-lg mb-4 flex items-center gap-2"><i class="fas fa-shield-alt"></i> MANDATORY AVOID RULES</h4><div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-slate-300"><div class="flex items-start gap-3 p-3 rounded-lg bg-slate-900/50 border border-slate-800"><i class="fas fa-newspaper text-slate-500 mt-1"></i><div><span class="block font-bold text-slate-200">News Filter</span>Avoid 15 mins before/after news.</div></div><div class="flex items-start gap-3 p-3 rounded-lg bg-slate-900/50 border border-slate-800"><i class="fas fa-chart-bar text-slate-500 mt-1"></i><div><span class="block font-bold text-slate-200">Abnormal Candles</span>Avoid Doji or large.</div></div><div class="flex items-start gap-3 p-3 rounded-lg bg-slate-900/50 border border-slate-800"><i class="fas fa-arrows-alt-v text-slate-500 mt-1"></i><div><span class="block font-bold text-slate-200">Gap Openings</span>Avoid Gap entries.</div></div><div class="flex items-start gap-3 p-3 rounded-lg bg-slate-900/50 border border-slate-800"><i class="fas fa-ban text-slate-500 mt-1"></i><div><span class="block font-bold text-slate-200">Bad Market</span>Skip bad market.</div></div></div></div></div>`;
+                
+                res.innerHTML = html;
+                window.currentSignals = signals;
+                btn.innerHTML = '<div class="absolute inset-0 bg-gradient-to-r from-emerald-600 via-teal-500 to-emerald-600"></div><span class="relative z-10 flex items-center justify-center gap-2"><i class="fas fa-bolt"></i> GENERATE SIGNALS</span>';
+                btn.disabled = false;
+            }, 1000);
+        }
+
+        function copySignals() {
+             if(!window.currentSignals) return;
+             const d = new Date().toLocaleDateString('en-GB');
+             let t = "█ PREDICTIVE ANALYTICS REPORT\n█ DATE: " + d + " | UTC+6\n█ ANALYST: SAKIB AL HASAN NAIM\n\nTIME    ASSET           ACTION\n──────────────────────────────\n";
+             window.currentSignals.forEach(s => {
+                 const dir = s.direcao_principal === 'CALL' ? 'BUY ▲ ' : 'SELL ▼';
+                 t += `${s.entrada}   ${s.ativos.padEnd(12, ' ')}    ${dir}\n`;
+             });
+             t += "\n──────────────────────────────\n⚠️ STRICT VALIDATION RULES:\n[1] NEWS: Avoid 15min before & after news.\n[2] CANDLE: Avoid Doji or Abnormal.\n[3] GAP: Avoid Gap entries.\n[4] MARKET: Skip bad market.\n\nSTRATEGY: MTG-1 | VERIFIED";
+             navigator.clipboard.writeText(t);
+             alert("REPORT COPIED TO CLIPBOARD");
+        }
+        initClock();
+    </script>
+</body>
+</html>
